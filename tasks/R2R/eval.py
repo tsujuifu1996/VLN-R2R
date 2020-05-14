@@ -140,8 +140,8 @@ def eval_seq2seq():
 
 if __name__ == '__main__':
 
-    eval_simple_agents()
-    #eval_seq2seq()
+    # eval_simple_agents()
+    eval_seq2seq()
 
 
 

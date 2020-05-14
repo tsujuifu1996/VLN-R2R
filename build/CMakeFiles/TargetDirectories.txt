@@ -1,0 +1,8 @@
+/mnt/hhd/tsujuifu/Workspace/VLN-R2R/build/CMakeFiles/rebuild_cache.dir
+/mnt/hhd/tsujuifu/Workspace/VLN-R2R/build/CMakeFiles/mattersim_main.dir
+/mnt/hhd/tsujuifu/Workspace/VLN-R2R/build/CMakeFiles/edit_cache.dir
+/mnt/hhd/tsujuifu/Workspace/VLN-R2R/build/CMakeFiles/MatterSimPython.dir
+/mnt/hhd/tsujuifu/Workspace/VLN-R2R/build/CMakeFiles/tests.dir
+/mnt/hhd/tsujuifu/Workspace/VLN-R2R/build/CMakeFiles/MatterSim.dir
+/mnt/hhd/tsujuifu/Workspace/VLN-R2R/build/pybind11/CMakeFiles/edit_cache.dir
+/mnt/hhd/tsujuifu/Workspace/VLN-R2R/build/pybind11/CMakeFiles/rebuild_cache.dir
