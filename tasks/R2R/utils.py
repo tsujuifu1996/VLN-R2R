@@ -33,11 +33,13 @@ def load_nav_graphs(scans):
             data = json.load(f)
             for i,item in enumerate(data):
                 if item['included']:
+                # if True:
                     for j,conn in enumerate(item['unobstructed']):
                         if conn and data[j]['included']:
+                        # if conn:
                             positions[item['image_id']] = np.array([item['pose'][3],
                                     item['pose'][7], item['pose'][11]]);
-                            assert data[j]['unobstructed'][i], 'Graph should be undirected'
+                            # assert data[j]['unobstructed'][i], 'Graph should be undirected'
                             G.add_edge(item['image_id'],data[j]['image_id'],weight=distance(item,data[j]))
             nx.set_node_attributes(G, values=positions, name='position')
             graphs[scan] = G
@@ -47,9 +49,12 @@ def load_nav_graphs(scans):
 def load_datasets(splits):
     data = []
     for split in splits:
-        assert split in ['train', 'val_seen', 'val_unseen', 'test']
+        
         with open('tasks/R2R/data/R2R_%s.json' % split) as f:
             data += json.load(f)
+           
+        print('Data: %d' % (len(data)))
+        
     return data
 
 

@@ -28,7 +28,7 @@ class BaseAgent(object):
         self.losses = [] # For learning agents
 
     def write_results(self):
-        output = [{'instr_id':k, 'trajectory': v} for k,v in self.results.items()]
+        output = [{'instr_id':k, 'trajectory': v, 'action': a} for k, (v, a) in self.results.items()]
         with open(self.results_path, 'w') as f:
             json.dump(output, f)
 
@@ -52,7 +52,7 @@ class BaseAgent(object):
                 if traj['instr_id'] in self.results:
                     looped = True
                 else:
-                    self.results[traj['instr_id']] = traj['path']
+                    self.results[traj['instr_id']] = [traj['path'], traj['action']]
             if looped:
                 break
 
@@ -219,7 +219,8 @@ class Seq2SeqAgent(BaseAgent):
         # Record starting point
         traj = [{
             'instr_id': ob['instr_id'],
-            'path': [(ob['viewpoint'], ob['heading'], ob['elevation'])]
+            'path': [(ob['viewpoint'], ob['heading'], ob['elevation'])], 
+            'action': []
         } for ob in perm_obs]
 
         # Forward through encoder, giving initial hidden state and memory cell for decoder
@@ -265,6 +266,8 @@ class Seq2SeqAgent(BaseAgent):
                 if action_idx == self.model_actions.index('<end>'):
                     ended[i] = True
                 env_action[idx] = self.env_actions[action_idx]
+                
+                traj[i]['action'].append(env_action[idx])
 
             obs = np.array(self.env.step(env_action))
             perm_obs = obs[perm_idx]
@@ -279,6 +282,7 @@ class Seq2SeqAgent(BaseAgent):
                 break
 
         self.losses.append(self.loss.item() / self.episode_len)
+        
         return traj
 
     def test(self, use_dropout=False, feedback='argmax', allow_cheat=False):

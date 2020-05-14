@@ -24,11 +24,11 @@ RESULT_DIR = 'tasks/R2R/results/'
 SNAPSHOT_DIR = 'tasks/R2R/snapshots/'
 PLOT_DIR = 'tasks/R2R/plots/'
 
-IMAGENET_FEATURES = 'img_features/ResNet-152-imagenet.tsv'
+IMAGENET_FEATURES = 'img_features/features_test1.npy'
 MAX_INPUT_LENGTH = 80
 
 features = IMAGENET_FEATURES
-batch_size = 100
+batch_size = 3
 max_episode_len = 20
 word_embedding_size = 256
 action_embedding_size = 32
@@ -117,9 +117,9 @@ def test_submission():
 
     setup()
     # Create a batch training environment that will also preprocess text
-    vocab = read_vocab(TRAINVAL_VOCAB)
+    vocab = read_vocab(TRAIN_VOCAB)
     tok = Tokenizer(vocab=vocab, encoding_length=MAX_INPUT_LENGTH)
-    train_env = R2RBatch(features, batch_size=batch_size, splits=['train', 'val_seen', 'val_unseen'], tokenizer=tok)
+    # train_env = R2RBatch(features, batch_size=batch_size, splits=['train', 'val_seen', 'val_unseen'], tokenizer=tok)
 
     # Build models and train
     enc_hidden_size = hidden_size//2 if bidirectional else hidden_size
@@ -127,12 +127,16 @@ def test_submission():
                   dropout_ratio, bidirectional=bidirectional).cuda()
     decoder = AttnDecoderLSTM(Seq2SeqAgent.n_inputs(), Seq2SeqAgent.n_outputs(),
                   action_embedding_size, hidden_size, dropout_ratio).cuda()
-    train(train_env, encoder, decoder, n_iters)
+    # train(train_env, encoder, decoder, n_iters)
+    
+    encoder.load_state_dict(torch.load('%s/seq2seq_enc.pt' % (SNAPSHOT_DIR)))
+    decoder.load_state_dict(torch.load('%s/seq2seq_dec.pt' % (SNAPSHOT_DIR)))
 
     # Generate test submission
-    test_env = R2RBatch(features, batch_size=batch_size, splits=['test'], tokenizer=tok)
+    test_env = R2RBatch(features, batch_size=batch_size, splits=['test1'], tokenizer=tok)
+    
     agent = Seq2SeqAgent(test_env, "", encoder, decoder, max_episode_len)
-    agent.results_path = '%s%s_%s_iter_%d.json' % (RESULT_DIR, model_prefix, 'test', 20000)
+    agent.results_path = '%s%s_%s_iter_%d.json' % (RESULT_DIR, 'seq2seq', 'test1', 20000)
     agent.test(use_dropout=False, feedback='argmax')
     agent.write_results()
 
@@ -160,5 +164,5 @@ def train_val():
 
 
 if __name__ == "__main__":
-    train_val()
-    #test_submission()
+    # train_val()
+    test_submission()

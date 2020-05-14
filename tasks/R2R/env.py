@@ -23,7 +23,7 @@ class EnvBatch():
     def __init__(self, feature_store=None, batch_size=100):
         if feature_store:
             print('Loading image features from %s' % feature_store)
-            tsv_fieldnames = ['scanId', 'viewpointId', 'image_w','image_h', 'vfov', 'features']
+            ''''tsv_fieldnames = ['scanId', 'viewpointId', 'image_w','image_h', 'vfov', 'features']
             self.features = {}
             with open(feature_store, "rt") as tsv_in_file:
                 reader = csv.DictReader(tsv_in_file, delimiter='\t', fieldnames = tsv_fieldnames)
@@ -33,7 +33,17 @@ class EnvBatch():
                     self.vfov = int(item['vfov'])
                     long_id = self._make_id(item['scanId'], item['viewpointId'])
                     self.features[long_id] = np.frombuffer(base64.b64decode(item['features']),
-                            dtype=np.float32).reshape((36, 2048))
+                            dtype=np.float32).reshape((36, 2048))'''
+            
+            feat = np.load(feature_store)
+            self.features = {}
+            for f in feat:
+                self.image_h = f['image_h']
+                self.image_w = f['image_w']
+                self.vfov = f['vfov']
+                long_id = self._make_id(f['scanId'], f['viewpointId'][0])
+                self.features[long_id] = np.array(f['features'])
+            
         else:
             print('Image features not provided')
             self.features = None
